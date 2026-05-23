@@ -1,0 +1,80 @@
+### Closira API Tests
+### Use with VS Code REST Client extension
+
+@base = http://localhost:8000
+
+### 1. Health Check
+GET {{base}}/health
+
+### 2. Create pricing enquiry (matches Pricing Question SOP)
+POST {{base}}/enquiry
+Content-Type: application/json
+
+{
+  "channel": "whatsapp",
+  "customer_name": "Sarah Mitchell",
+  "message": "Hi I want to know your pricing for the premium plan"
+}
+
+### 3. Create booking enquiry (matches Booking Enquiry SOP)
+POST {{base}}/enquiry
+Content-Type: application/json
+
+{
+  "channel": "email",
+  "customer_name": "Raj Verma",
+  "message": "I want to book an appointment for next Monday"
+}
+
+### 4. Create complaint (matches Complaint SOP)
+POST {{base}}/enquiry
+Content-Type: application/json
+
+{
+  "channel": "call",
+  "customer_name": "Priya Sharma",
+  "message": "I am very upset and want a refund immediately"
+}
+
+### 5. Create no-match enquiry (auto-escalates)
+POST {{base}}/enquiry
+Content-Type: application/json
+
+{
+  "channel": "whatsapp",
+  "customer_name": "Test User",
+  "message": "zxqzxq random gibberish"
+}
+
+### 6. Get enquiry history (replace ID with real one)
+GET {{base}}/enquiry/enq_8b3678eb/history
+
+### 7. Schedule follow-up
+POST {{base}}/enquiry/enq_8b3678eb/followup
+Content-Type: application/json
+
+{
+  "delay_minutes": 30,
+  "message_template": "Hi Sarah, just following up on your enquiry!"
+}
+
+### 8. Escalate enquiry
+POST {{base}}/enquiry/enq_f56a4412/escalate
+Content-Type: application/json
+
+{
+  "reason": "Customer called back and is very upset"
+}
+
+### 9. Invalid channel - should return 422
+POST {{base}}/enquiry
+Content-Type: application/json
+
+{
+  "channel": "telegram",
+  "customer_name": "Test",
+  "message": "hello"
+}
+
+### 10. Non-existent enquiry - should return 404
+GET {{base}}/enquiry/enq_doesnotexist/history

@@ -20,9 +20,19 @@ class EnquiryCreate(BaseModel):
     message: str = Field(
         ...,
         description="The customer's raw inbound message",
-        example="Hi, I'd like to know your pricing for the premium plan.",
+        example="Hi I want to know your pricing for the premium plan",
         min_length=1,
     )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [{
+                "channel": "whatsapp",
+                "customer_name": "Sarah Mitchell",
+                "message": "Hi I want to know your pricing for the premium plan"
+            }]
+        }
+    }
 
 
 class EnquiryCreatedResponse(BaseModel):
@@ -45,6 +55,15 @@ class FollowUpCreate(BaseModel):
         example="Hi {customer_name}, just following up on your enquiry!",
     )
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [{
+                "delay_minutes": 30,
+                "message_template": "Hi {customer_name}, just following up on your enquiry!"
+            }]
+        }
+    }
+
 
 class FollowUpResponse(BaseModel):
     follow_up_id: str
@@ -57,9 +76,17 @@ class EscalateCreate(BaseModel):
     reason: str = Field(
         ...,
         description="Reason for escalating to a human agent",
-        example="Customer is requesting an immediate refund.",
+        example="Customer called back and is very upset, requesting immediate refund.",
         min_length=1,
     )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [{
+                "reason": "Customer called back and is very upset, requesting immediate refund."
+            }]
+        }
+    }
 
 
 class EscalateResponse(BaseModel):
