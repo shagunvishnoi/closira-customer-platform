@@ -28,6 +28,8 @@ async def lifespan(app: FastAPI):
     logger.info("Closira API shutting down")
 
 
+from fastapi.responses import RedirectResponse
+
 app = FastAPI(
     title="Closira Enquiry API",
     description=(
@@ -38,6 +40,11 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+
+@app.get("/", include_in_schema=False)
+async def root_redirect():
+    return RedirectResponse(url="/docs")
 
 
 @app.post(
@@ -93,7 +100,7 @@ def create_enquiry(
 
 
 @app.post(
-    "/enquiry/{enquiry_id}/followup",
+    "/enquiry/{id}/follow-up",
     response_model=FollowUpResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Schedule a follow-up for an enquiry",
@@ -101,13 +108,13 @@ def create_enquiry(
     tags=["Enquiries"],
 )
 def schedule_followup(
-    enquiry_id: str,
+    id: str,
     body: FollowUpCreate,
     db: Session = Depends(get_db),
 ):
-    enquiry = db.query(Enquiry).filter(Enquiry.id == enquiry_id).first()
+    enquiry = db.query(Enquiry).filter(Enquiry.id == id).first()
     if not enquiry:
-        raise HTTPException(status_code=404, detail=f"Enquiry '{enquiry_id}' not found.")
+        raise HTTPException(status_code=404, detail=f"Enquiry '{id}' not found.")
 
     if enquiry.status == "resolved":
         raise HTTPException(status_code=409, detail="Cannot schedule a follow-up for a resolved enquiry.")
@@ -116,7 +123,7 @@ def schedule_followup(
     template = body.message_template or f"Hi {enquiry.customer_name}, just following up on your enquiry!"
 
     follow_up = FollowUp(
-        enquiry_id=enquiry_id,
+        enquiry_id=id,
         delay_minutes=str(body.delay_minutes),
         message_template=template,
         scheduled_at=scheduled_at,
@@ -127,7 +134,7 @@ def schedule_followup(
     enquiry.updated_at = datetime.utcnow()
 
     timeline_entry = StatusTimeline(
-        enquiry_id=enquiry_id,
+        enquiry_id=id,
         status="follow_up_scheduled",
         note=f"Follow-up scheduled in {body.delay_minutes} minutes.",
     )
@@ -135,18 +142,18 @@ def schedule_followup(
     db.commit()
     db.refresh(follow_up)
 
-    logger.info("Follow-up scheduled", extra={"enquiry_id": enquiry_id, "delay_minutes": body.delay_minutes})
+    logger.info("Follow-up scheduled", extra={"enquiry_id": id, "delay_minutes": body.delay_minutes})
 
     return FollowUpResponse(
         follow_up_id=follow_up.id,
-        enquiry_id=enquiry_id,
+        enquiry_id=id,
         scheduled_at=scheduled_at,
         message_template=template,
     )
 
 
 @app.post(
-    "/enquiry/{enquiry_id}/escalate",
+    "/enquiry/{id}/escalate",
     response_model=EscalateResponse,
     status_code=status.HTTP_200_OK,
     summary="Escalate an enquiry to a human agent",
@@ -154,13 +161,13 @@ def schedule_followup(
     tags=["Enquiries"],
 )
 def escalate_enquiry(
-    enquiry_id: str,
+    id: str,
     body: EscalateCreate,
     db: Session = Depends(get_db),
 ):
-    enquiry = db.query(Enquiry).filter(Enquiry.id == enquiry_id).first()
+    enquiry = db.query(Enquiry).filter(Enquiry.id == id).first()
     if not enquiry:
-        raise HTTPException(status_code=404, detail=f"Enquiry '{enquiry_id}' not found.")
+        raise HTTPException(status_code=404, detail=f"Enquiry '{id}' not found.")
 
     if enquiry.status == "escalated":
         raise HTTPException(status_code=409, detail="Enquiry is already escalated.")
@@ -170,17 +177,17 @@ def escalate_enquiry(
     enquiry.updated_at = datetime.utcnow()
 
     timeline_entry = StatusTimeline(
-        enquiry_id=enquiry_id,
+        enquiry_id=id,
         status="escalated",
         note=f"Manually escalated. Reason: {body.reason}",
     )
     db.add(timeline_entry)
     db.commit()
 
-    logger.warning("Enquiry escalated", extra={"enquiry_id": enquiry_id, "reason": body.reason})
+    logger.warning("Enquiry escalated", extra={"enquiry_id": id, "reason": body.reason})
 
     return EscalateResponse(
-        enquiry_id=enquiry_id,
+        enquiry_id=id,
         status="escalated",
         reason=body.reason,
         message="Enquiry has been escalated to a human agent.",
@@ -188,7 +195,7 @@ def escalate_enquiry(
 
 
 @app.get(
-    "/enquiry/{enquiry_id}/history",
+    "/enquiry/{id}/history",
     response_model=EnquiryHistory,
     status_code=status.HTTP_200_OK,
     summary="Get full conversation history and status timeline",
@@ -196,12 +203,12 @@ def escalate_enquiry(
     tags=["Enquiries"],
 )
 def get_enquiry_history(
-    enquiry_id: str,
+    id: str,
     db: Session = Depends(get_db),
 ):
-    enquiry = db.query(Enquiry).filter(Enquiry.id == enquiry_id).first()
+    enquiry = db.query(Enquiry).filter(Enquiry.id == id).first()
     if not enquiry:
-        raise HTTPException(status_code=404, detail=f"Enquiry '{enquiry_id}' not found.")
+        raise HTTPException(status_code=404, detail=f"Enquiry '{id}' not found.")
 
     return EnquiryHistory(
         enquiry_id=enquiry.id,

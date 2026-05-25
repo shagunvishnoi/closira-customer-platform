@@ -50,7 +50,7 @@ Content-Type: application/json
 GET {{base}}/enquiry/enq_8b3678eb/history
 
 ### 7. Schedule follow-up
-POST {{base}}/enquiry/enq_8b3678eb/followup
+POST {{base}}/enquiry/enq_8b3678eb/follow-up
 Content-Type: application/json
 
 {

@@ -1,0 +1,88 @@
+export const enquiries = [
+    {
+      id: "enq_001",
+      customer_name: "Sarah Mitchell",
+      channel: "whatsapp",
+      status: "escalated",
+      sop_matched: "Pricing Question",
+      suggested_response:
+        "Great question! Our pricing starts from ₹999/month for the Starter plan. Reply here and we'll send you a tailored proposal.",
+      escalation_reason: "Customer unhappy with quote, requested manager.",
+      message: "Hi I want to know your pricing for the premium plan",
+      created_at: "2025-05-20T09:14:00Z",
+      summary: "Customer unhappy with quote, requested manager callback.",
+      urgency: "high",
+    },
+    {
+      id: "enq_002",
+      customer_name: "Raj Verma",
+      channel: "email",
+      status: "qualified",
+      sop_matched: "Booking Enquiry",
+      suggested_response:
+        "Thanks for reaching out! We'd love to help you book an appointment. Please share your preferred date and time and we'll confirm within 24 hours.",
+      escalation_reason: null,
+      message: "I want to book an appointment for next Monday",
+      created_at: "2025-05-20T08:30:00Z",
+      summary: "Lead qualified. Appointment booking request for Monday.",
+      urgency: null,
+    },
+    {
+      id: "enq_003",
+      customer_name: "Priya Sharma",
+      channel: "call",
+      status: "escalated",
+      sop_matched: "Complaint",
+      suggested_response:
+        "We're really sorry to hear about your experience. A senior team member will personally review your case and contact you within 2 hours.",
+      escalation_reason: "Customer is very upset and wants a refund immediately.",
+      message: "I am very upset and want a refund immediately",
+      created_at: "2025-05-20T07:55:00Z",
+      summary: "Complaint escalated. Refund requested urgently.",
+      urgency: "high",
+    },
+    {
+      id: "enq_004",
+      customer_name: "Arjun Mehta",
+      channel: "whatsapp",
+      status: "new",
+      sop_matched: "General Support",
+      suggested_response:
+        "Thanks for getting in touch! Our support team is here to help. Could you share a bit more detail? We'll get back to you shortly.",
+      escalation_reason: null,
+      message: "Hey I need some help with my account",
+      created_at: "2025-05-20T10:02:00Z",
+      summary: "General support request. Awaiting more details.",
+      urgency: null,
+    },
+    {
+      id: "enq_005",
+      customer_name: "Neha Kapoor",
+      channel: "email",
+      status: "escalated",
+      sop_matched: null,
+      suggested_response: null,
+      escalation_reason: "No SOP matched. Flagged for human review.",
+      message: "zvxqpqr random gibberish test",
+      created_at: "2025-05-20T10:45:00Z",
+      summary: "Auto-escalated. No SOP matched.",
+      urgency: "medium",
+    },
+    {
+      id: "enq_006",
+      customer_name: "Vikram Singh",
+      channel: "call",
+      status: "qualified",
+      sop_matched: "After-Hours Message",
+      suggested_response:
+        "We've received your message! Our team is currently outside business hours (9 AM – 6 PM). We'll get back to you first thing on the next business day.",
+      escalation_reason: null,
+      message: "Calling after hours about my subscription renewal",
+      created_at: "2025-05-19T22:10:00Z",
+      summary: "After-hours inquiry. Auto-response sent.",
+      urgency: null,
+    },
+  ];
+  
+  export const getEnquiryById = (id) => enquiries.find((e) => e.id === id);
+  
